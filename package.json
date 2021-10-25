@@ -1,7 +1,7 @@
 {
-  "name": "anlerkan-backend",
+  "name": "duofinder-backend",
   "version": "1.0.0",
-  "description": "anlerkan-backend",
+  "description": "duofinder-backend",
   "main": "./src/index.ts",
   "scripts": {
     "lint": "eslint src/**/*.ts",

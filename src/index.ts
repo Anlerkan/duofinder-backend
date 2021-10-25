@@ -15,7 +15,7 @@ const emailSender = EmailSender.getInstance();
 emailSender.activate();
 emailSender.setEmailApi(new NodeMailerEmailApi());
 
-const uri = `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.wil9t.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@cluster0.bsxbu.mongodb.net/duofinderDB?retryWrites=true&w=majority`;
 
 mongoose
   .connect(uri, {
