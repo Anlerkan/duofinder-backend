@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 
 import { InvalidInput } from '../errors';
+import Unauthorized from '../errors/unauthorized';
 import { User } from '../models';
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -14,14 +15,7 @@ export async function getLoggedInUser(req: Request, res: Response) {
   }
 
   if (!user) {
-    errors.push({
-      location: 'body',
-      value: 'user',
-      param: 'user',
-      msg: 'User was not found.'
-    });
-
-    throw new InvalidInput(errors);
+    throw new Unauthorized();
   }
 
   return res.status(200).send(user);

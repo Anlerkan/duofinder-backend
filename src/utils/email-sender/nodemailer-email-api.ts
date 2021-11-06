@@ -9,9 +9,6 @@ import {
 } from './types';
 import NodeMailerAppSmtpServer from './nodemailer-smtp-server';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { name: projectName } = require('../../../package.json');
-
 export default class NodemailerEmailApi implements EmailApi {
   private transporter: Mail;
 
@@ -26,7 +23,7 @@ export default class NodemailerEmailApi implements EmailApi {
 
     const emailVerificationLink = this.buildSignupEmailVerificationLink(emailVerificationToken);
 
-    const subject = `Welcome to ${projectName}! Please verify your email adress`;
+    const subject = 'Welcome to Duofinder! Please verify your email address';
     const textBody = this.buildSignupVerificationEmailTextBody(emailVerificationLink);
     const htmlBody = this.buildSignupVerificationEmailHtmlBody(emailVerificationLink);
 
@@ -47,7 +44,7 @@ export default class NodemailerEmailApi implements EmailApi {
     const { toEmail, subject, htmlBody, textBody } = args;
 
     await this.transporter.sendMail({
-      from: `${projectName} <noreply@${projectName}.com>`,
+      from: 'Duofinder <noreply@duofinder.com>',
       to: toEmail,
       subject,
       text: textBody,
@@ -56,11 +53,11 @@ export default class NodemailerEmailApi implements EmailApi {
   }
 
   private buildSignupVerificationEmailTextBody(emailVerificationLink: string): string {
-    return `Welcome to ${projectName}! Please click on the link below (or copy it to your browser) to verify your email address.${emailVerificationLink}`;
+    return `Welcome to Duofinder! Please click on the link below (or copy it to your browser) to verify your email address.${emailVerificationLink}`;
   }
 
   private buildSignupVerificationEmailHtmlBody(emailVerificationLink: string): string {
-    return `<h1>Welcome to ${projectName}</h1>
+    return `<h1>Welcome to Duofinder</h1>
     <br/>
     Please click on the link below (or copy it to your browser) to verify your email address.
     <br/>
