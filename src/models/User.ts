@@ -8,6 +8,7 @@ export type UserDocument = mongoose.Document & {
   email: string;
   password: string;
   username: string;
+  isAdmin: boolean;
   isVerified?: boolean;
 };
 
@@ -29,6 +30,11 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     required: false
+  },
+  isAdmin: {
+    type: Boolean,
+    required: true,
+    default: false
   },
   isVerified: {
     type: Boolean,

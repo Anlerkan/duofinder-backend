@@ -1,5 +1,12 @@
 import { Request } from 'express';
 
+export interface PaginationParams {
+  offset: number;
+  limit: number;
+  search?: string;
+  ordering?: string;
+}
+
 export interface PaginatedResult<T> {
   count: number;
   results: T[];
@@ -7,11 +14,8 @@ export interface PaginatedResult<T> {
   previous: null | string;
 }
 
-export interface SerializePaginationResultProps<T> {
+export type SerializePaginationResultProps<T> = PaginationProps & {
   items: T[];
   count: number;
-  offset: number;
-  limit: number;
   req: Request;
-  search?: string;
-}
+};

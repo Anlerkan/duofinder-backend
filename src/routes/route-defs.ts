@@ -3,3 +3,6 @@ export const VERIFY_ROUTE = '/api/auth/verify/';
 export const LOGIN_ROUTE = '/api/auth/login/';
 
 export const USERS_ME_ROUTE = '/api/users/me/';
+
+export const GAMES_ROUTE = '/api/games/';
+export const GAME_DETAIL_ROUTE = '/api/games/:id';

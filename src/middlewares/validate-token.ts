@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { JwtPayload, verify } from 'jsonwebtoken';
 
 import Unauthorized from '../errors/unauthorized';
+import { User } from '../models';
 
 export type ValidateTokenArgs = {
   req: Request;
@@ -23,8 +24,6 @@ declare global {
 }
 
 function validateToken(req: Request, res: Response, next: NextFunction): Response | void {
-  const unAuthorizedError = new Unauthorized();
-
   if (req.cookies && req.cookies['access-token']) {
     try {
       const validToken = verify(
@@ -37,15 +36,11 @@ function validateToken(req: Request, res: Response, next: NextFunction): Respons
         return next();
       }
     } catch (err) {
-      return res
-        .status(unAuthorizedError.getStatusCode())
-        .send(unAuthorizedError.serializeErrorOutput());
+      throw new Unauthorized();
     }
   }
 
-  return res
-    .status(unAuthorizedError.getStatusCode())
-    .send(unAuthorizedError.serializeErrorOutput());
+  throw new Unauthorized();
 }
 
 export default validateToken;
