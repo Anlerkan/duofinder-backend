@@ -22,5 +22,5 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true
   })
-  .then(() => app.listen(3000, () => console.log('Backend is running')))
+  .then(() => app.listen(process.env.PORT || 5000, () => console.log('Backend is running')))
   .catch((err) => console.log(err));
