@@ -8,7 +8,7 @@ import { User } from '../models';
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export async function getLoggedInUser(req: Request, res: Response) {
   const errors = validationResult(req).array();
-  const user = await User.findById(req.userId);
+  const user = await User.findById(req.userId).select('-password');
 
   if (errors.length > 0) {
     throw new InvalidInput(errors);

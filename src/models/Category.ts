@@ -3,6 +3,7 @@ import { InvalidInput } from '../errors';
 
 export type CategoryDocument = mongoose.Document & {
   name: string;
+  description: string;
 };
 
 export type CategoryModel = mongoose.Model<CategoryDocument>;

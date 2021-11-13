@@ -16,15 +16,13 @@ function generatePaginationUrl<T>(
   const baseUrl = generateBaseUrlByRequest(req);
 
   if (totalCount >= offset && offset + limit >= 0 && offset > 0) {
-    previous = `${baseUrl}/posts?offset=${offset - limit < 0 ? 0 : offset - limit}&limit=${limit}${
+    previous = `${baseUrl}?offset=${offset - limit < 0 ? 0 : offset - limit}&limit=${limit}${
       search ? `&search=${search}` : ''
     }`;
   }
 
   if (totalCount > limit + offset) {
-    next = `${baseUrl}/posts?offset=${offset + limit}&limit=${limit}${
-      search ? `&search=${search}` : ''
-    }`;
+    next = `${baseUrl}?offset=${offset + limit}&limit=${limit}${search ? `&search=${search}` : ''}`;
   }
 
   return { next, previous };

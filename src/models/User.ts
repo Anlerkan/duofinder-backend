@@ -3,12 +3,14 @@ import mongoose, { UpdateQuery } from 'mongoose';
 import { DuplicatedEmail } from '../errors';
 import DuplicatedUsername from '../errors/duplicated-username';
 import { PasswordHash } from '../utils';
+import { GameDocument } from './Game';
 
 export type UserDocument = mongoose.Document & {
   email: string;
   password: string;
   username: string;
   isAdmin: boolean;
+  games: GameDocument[];
   isVerified?: boolean;
 };
 
@@ -39,7 +41,14 @@ const userSchema = new mongoose.Schema({
   isVerified: {
     type: Boolean,
     default: false
-  }
+  },
+  games: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Game',
+      default: []
+    }
+  ]
 });
 
 async function validateUniqueness(userDoc: UserDocument) {

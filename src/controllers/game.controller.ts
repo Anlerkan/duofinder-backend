@@ -53,7 +53,7 @@ export async function addGame(req: Request, res: Response) {
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export async function getGameById(req: Request, res: Response) {
-  // TODO: Improve the approach, what if this service call fails because of another reason?
+  // TODO: Improve this approach, what if this service call fails because of another reason?
   try {
     const game = await Game.findById(req.params.id);
 

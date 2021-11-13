@@ -3,7 +3,6 @@ import { Request, Response, NextFunction } from 'express';
 import { JwtPayload, verify } from 'jsonwebtoken';
 
 import Unauthorized from '../errors/unauthorized';
-import { User } from '../models';
 
 export type ValidateTokenArgs = {
   req: Request;
@@ -23,7 +22,7 @@ declare global {
   }
 }
 
-function validateToken(req: Request, res: Response, next: NextFunction): Response | void {
+function validateToken(req: Request, _res: Response, next: NextFunction): Response | void {
   if (req.cookies && req.cookies['access-token']) {
     try {
       const validToken = verify(

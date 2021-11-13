@@ -1,8 +1,13 @@
 import mongoose, { UpdateQuery } from 'mongoose';
+
 import { InvalidInput } from '../errors';
+import { CategoryDocument } from './Category';
 
 export type GameDocument = mongoose.Document & {
   name: string;
+  description: string;
+  image: string;
+  categories: CategoryDocument[];
 };
 
 export type GameModel = mongoose.Model<GameDocument>;
