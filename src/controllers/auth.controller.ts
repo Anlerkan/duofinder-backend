@@ -8,6 +8,7 @@ import { EmailSender, PasswordHash } from '../utils';
 import { Jwt } from '../utils/jwt';
 import { UserSignedUp } from '../events';
 import { generateEmailVerificationToken } from '../utils/account-verification';
+import UserVerified from '../events/user-verified';
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export async function login(req: Request, res: Response) {
@@ -65,9 +66,10 @@ export async function login(req: Request, res: Response) {
 
   const accessToken = Jwt.createToken({ user });
 
-  res.cookie('access-token', accessToken, { maxAge: 60 * 60 * 24 * 30 * 1000 });
-
-  return res.status(userLoggedInEvent.getStatusCode()).send(userLoggedInEvent.serializeRest());
+  return res
+    .cookie('access-token', accessToken, { maxAge: 60 * 60 * 24 * 30 * 1000, httpOnly: true })
+    .status(userLoggedInEvent.getStatusCode())
+    .send(userLoggedInEvent.serializeRest());
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -115,4 +117,44 @@ export async function signup(req: Request, res: Response) {
   });
 
   return res.status(userSignedUpEvent.getStatusCode()).send(userSignedUpEvent.serializeRest());
+}
+
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+export async function verifyUser(req: Request, res: Response) {
+  const errors = validationResult(req).array();
+
+  if (errors.length > 0) {
+    throw new Error('Email verification token is invalid');
+  }
+
+  const { emailVerificationToken } = req.body;
+
+  const verificationDoc = await AccountVerification.findOne({ emailVerificationToken });
+
+  if (!verificationDoc) {
+    throw new Error('Email verification token is invalid or expired');
+  }
+
+  const user = await User.findOneAndUpdate(
+    {
+      _id: verificationDoc.userId
+    },
+    {
+      isVerified: true
+    },
+    {
+      new: true
+    }
+  );
+
+  if (!user) {
+    throw new Error('User with the corresponding verification token was not found');
+  }
+
+  const userVerified = new UserVerified(user);
+
+  //  Delete verification token after user is verified
+  await AccountVerification.findOneAndDelete({ emailVerificationToken });
+
+  return res.sendStatus(userVerified.getStatusCode());
 }
