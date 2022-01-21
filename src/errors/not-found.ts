@@ -1,5 +1,5 @@
 import BaseCustomError from './base-custom-error';
-import { SerializedErrorOutput } from './types/serialized-error-output';
+import { SerializedError } from './types/serialized-error-output';
 
 export default class NotFoundError extends BaseCustomError {
   private statusCode = 404;
@@ -20,13 +20,9 @@ export default class NotFoundError extends BaseCustomError {
     return this.statusCode;
   }
 
-  serializeErrorOutput(): SerializedErrorOutput {
+  serializeErrorOutput(): SerializedError {
     return {
-      errors: [
-        {
-          message: this.errorMessage
-        }
-      ]
+      message: this.errorMessage
     };
   }
 }

@@ -16,7 +16,7 @@ export type UserDocument = mongoose.Document & {
 
 export type UserModel = mongoose.Model<UserDocument>;
 
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema<UserDocument>({
   email: {
     type: String,
     required: true

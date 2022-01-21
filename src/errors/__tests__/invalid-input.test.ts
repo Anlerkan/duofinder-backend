@@ -27,11 +27,11 @@ describe('tests the InvalidInput custom error class', () => {
     const invalidInputError = new InvalidInput(errors);
     const serializedErrors = invalidInputError.serializeErrorOutput();
 
-    expect(serializedErrors.errors).toHaveLength(1);
+    expect(Object.keys(serializedErrors.fields!)).toHaveLength(1);
 
-    const { fields = {} } = serializedErrors.errors[0];
+    const { fields = {} } = serializedErrors;
 
-    expect(serializedErrors.errors[0].message).toEqual('User input is not valid');
+    expect(serializedErrors.message).toEqual('User input is not valid');
     expect(Object.keys(fields)).toEqual(['password']);
     expect(fields.password).toHaveLength(2);
     expect(fields.password).toContain('Password must be between 8 and 32 characters');

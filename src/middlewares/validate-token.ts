@@ -1,14 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-
 import { JwtPayload, verify } from 'jsonwebtoken';
 
 import Unauthorized from '../errors/unauthorized';
-
-export type ValidateTokenArgs = {
-  req: Request;
-  res: Response;
-  next: NextFunction;
-};
 
 //  TO-DO: Find a better way to solve this
 

@@ -1,7 +1,7 @@
 import { ValidationError } from 'express-validator';
 
 import BaseCustomError from './base-custom-error';
-import { SerializedErrorOutput, SerializedErrorField } from './types/serialized-error-output';
+import { SerializedErrorField, SerializedError } from './types/serialized-error-output';
 
 export type InvalidInputConstructorErrorsParam = ValidationError[];
 
@@ -25,11 +25,11 @@ export default class InvalidInput extends BaseCustomError {
     return this.statusCode;
   }
 
-  serializeErrorOutput(): SerializedErrorOutput {
+  serializeErrorOutput(): SerializedError {
     return this.parseValidationErrors();
   }
 
-  private parseValidationErrors(): SerializedErrorOutput {
+  private parseValidationErrors(): SerializedError {
     const parsedErrors: SerializedErrorField = {};
 
     if (this.errors && this.errors.length > 0) {
@@ -43,12 +43,8 @@ export default class InvalidInput extends BaseCustomError {
     }
 
     return {
-      errors: [
-        {
-          message: this.defaultErrorMessage,
-          fields: parsedErrors
-        }
-      ]
+      message: this.defaultErrorMessage,
+      fields: parsedErrors
     };
   }
 }

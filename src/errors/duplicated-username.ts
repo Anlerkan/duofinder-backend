@@ -1,5 +1,5 @@
 import BaseCustomError from './base-custom-error';
-import { SerializedErrorOutput } from './types/serialized-error-output';
+import { SerializedError } from './types/serialized-error-output';
 
 export default class DuplicatedUsername extends BaseCustomError {
   private statusCode = 422;
@@ -16,13 +16,12 @@ export default class DuplicatedUsername extends BaseCustomError {
     return this.statusCode;
   }
 
-  serializeErrorOutput(): SerializedErrorOutput {
+  serializeErrorOutput(): SerializedError {
     return {
-      errors: [
-        {
-          message: this.defaultErrorMessage
-        }
-      ]
+      message: this.defaultErrorMessage,
+      fields: {
+        username: [this.defaultErrorMessage]
+      }
     };
   }
 }

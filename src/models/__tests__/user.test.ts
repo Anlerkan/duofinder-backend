@@ -33,9 +33,7 @@ describe('test the user mongoose model', () => {
     expect(err).toBeDefined();
     expect(err).toBeInstanceOf(BaseCustomError);
     expect(serializedErrorOutput).toBeDefined();
-    expect(serializedErrorOutput?.errors[0].message).toEqual(
-      'The email is already in the database'
-    );
+    expect(serializedErrorOutput?.message).toEqual('The email is already in the database');
   });
 
   it('should encrypt the password when creating the user', async () => {
@@ -121,8 +119,6 @@ describe('test the user mongoose model', () => {
     expect(err).toBeDefined();
     expect(err).toBeInstanceOf(BaseCustomError);
     expect(serializedErrorOutput).toBeDefined();
-    expect(serializedErrorOutput?.errors[0].message).toEqual(
-      'The email is already in the database'
-    );
+    expect(serializedErrorOutput?.message).toEqual('The email is already in the database');
   });
 });
