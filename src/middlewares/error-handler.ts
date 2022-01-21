@@ -7,8 +7,6 @@ const errorHandler = (err: Error, req: Request, res: Response, _next: NextFuncti
     return res.status(err.getStatusCode()).send(err.serializeErrorOutput());
   }
 
-  console.log(err);
-
   return res.sendStatus(500);
 };
 

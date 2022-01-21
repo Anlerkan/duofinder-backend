@@ -67,7 +67,6 @@ export default class NodemailerEmailApi implements EmailApi {
 
   private buildSignupEmailVerificationLink(emailVerificationToken: string): string {
     //  TO-DO: this URL should change
-
     return `http://localhost:3000/api/auth/verify/${emailVerificationToken}`;
   }
 }

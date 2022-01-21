@@ -157,7 +157,7 @@ describe('tests saving the signed up user to database', () => {
 
     const response = await request(app).post(SIGNUP_ROUTE).send(validUserInfo).expect(422);
 
-    expect(response.body.errors[0].message).toEqual('The email is already in the database');
+    expect(response.body.message).toEqual('The email is already in the database');
   });
 
   it('should not include the user password on the response', async () => {
