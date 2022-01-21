@@ -11,6 +11,7 @@ export type UserDocument = mongoose.Document & {
   username: string;
   isAdmin: boolean;
   games: GameDocument[];
+  nextOnboardingStep: 'personal-info' | 'connect-platforms' | 'select-games';
   isVerified?: boolean;
 };
 
@@ -37,6 +38,11 @@ const userSchema = new mongoose.Schema<UserDocument>({
     type: Boolean,
     required: true,
     default: false
+  },
+  nextOnboardingStep: {
+    type: String,
+    required: true,
+    default: 'personal-info'
   },
   isVerified: {
     type: Boolean,
