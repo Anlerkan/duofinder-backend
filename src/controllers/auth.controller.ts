@@ -3,24 +3,22 @@ import { Request, Response } from 'express';
 
 import { InvalidInput } from '../errors';
 import UserLoggedIn from '../events/user-logged-in';
-import { AccountVerification, User } from '../models';
+import { AccountVerification } from '../models';
 import { EmailSender, PasswordHash } from '../utils';
 import { Jwt } from '../utils/jwt';
 import { UserSignedUp } from '../events';
 import { generateEmailVerificationToken } from '../utils/account-verification';
 import UserVerified from '../events/user-verified';
+import userService from '../services/UserService';
+import accountVerificationService from '../services/AccountVerificationService';
+import NotFoundError from '../errors/not-found';
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export async function login(req: Request, res: Response) {
   const errors = validationResult(req).array();
 
   const { email, password } = req.body;
 
-  if (errors.length > 0) {
-    throw new InvalidInput(errors);
-  }
-
-  const user = await User.findOne({ email });
+  const user = await userService.findOne({ email });
 
   if (!user) {
     errors.push({
@@ -29,18 +27,18 @@ export async function login(req: Request, res: Response) {
       param: 'email',
       msg: 'User was not found.'
     });
-
-    throw new InvalidInput(errors);
   }
 
-  if (!user.isVerified) {
+  if (user && !user.isVerified) {
     errors.push({
       location: 'body',
       value: email,
       param: 'email',
       msg: 'User is not verified.'
     });
+  }
 
+  if (errors.length > 0 || !user) {
     throw new InvalidInput(errors);
   }
 
@@ -72,7 +70,6 @@ export async function login(req: Request, res: Response) {
     .send(userLoggedInEvent.serializeRest());
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export async function signup(req: Request, res: Response) {
   const errors = validationResult(req).array();
 
@@ -100,7 +97,7 @@ export async function signup(req: Request, res: Response) {
 
   const { email, password, username } = req.body;
 
-  const newUser = await User.create({ email, password, username });
+  const newUser = await userService.create({ email, password, username });
   const emailVerificationToken = generateEmailVerificationToken();
 
   const accountVerification = await AccountVerification.create({
@@ -119,7 +116,6 @@ export async function signup(req: Request, res: Response) {
   return res.status(userSignedUpEvent.getStatusCode()).send(userSignedUpEvent.serializeRest());
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export async function verifyUser(req: Request, res: Response) {
   const errors = validationResult(req).array();
 
@@ -129,32 +125,22 @@ export async function verifyUser(req: Request, res: Response) {
 
   const { emailVerificationToken } = req.body;
 
-  const verificationDoc = await AccountVerification.findOne({ emailVerificationToken });
+  const verificationDoc = await accountVerificationService.findOne({ emailVerificationToken });
 
   if (!verificationDoc) {
-    throw new Error('Email verification token is invalid or expired');
+    throw new NotFoundError('Email verification token is invalid or expired');
   }
 
-  const user = await User.findOneAndUpdate(
-    {
-      _id: verificationDoc.userId
-    },
-    {
-      isVerified: true
-    },
-    {
-      new: true
-    }
-  );
+  const user = await userService.partiallyUpdate(verificationDoc.userId, { isVerified: true });
 
   if (!user) {
-    throw new Error('User with the corresponding verification token was not found');
+    throw new NotFoundError('User with the corresponding verification token was not found');
   }
 
   const userVerified = new UserVerified(user);
 
   //  Delete verification token after user is verified
-  await AccountVerification.findOneAndDelete({ emailVerificationToken });
+  await accountVerificationService.delete(verificationDoc.id);
 
   return res.sendStatus(userVerified.getStatusCode());
 }

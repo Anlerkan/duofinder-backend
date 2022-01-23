@@ -3,14 +3,13 @@ import { validationResult } from 'express-validator';
 
 import { InvalidInput } from '../errors';
 import Unauthorized from '../errors/unauthorized';
-import PaginatedResultEvent from '../events/paginated-result';
-import { User, UserDocument } from '../models';
+import { UserDocument } from '../models';
+import userService from '../services/UserService';
 import { getPaginationParamsFromRequest } from '../utils/pagination/getPaginationParamsFromRequest';
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export async function getLoggedInUser(req: Request, res: Response) {
   const errors = validationResult(req).array();
-  const user = await User.findById(req.userId).select('-password');
+  const user = await userService.findOne({ id: req.userId }, '-password');
 
   if (errors.length > 0) {
     throw new InvalidInput(errors);
@@ -27,8 +26,7 @@ export async function getUserByUsername(
   req: Request,
   res: Response
 ): Promise<Response<UserDocument>> {
-  const user = await User.findOne({ username: req.params.username }).select('-password');
-
+  const user = await userService.findOne({ username: req.params.username });
   if (!user) {
     throw new InvalidInput([
       {
@@ -43,39 +41,62 @@ export async function getUserByUsername(
   return res.status(200).send(user);
 }
 
-export async function updateUser(req: Request, res: Response): Promise<Response<UserDocument>> {
-  const user = await User.findByIdAndUpdate(req.userId, req.body, { new: true });
+export async function updateAuthUser(req: Request, res: Response): Promise<Response<UserDocument>> {
+  const updatedUser = await userService.update(req.userId!, req.body);
+  const errors = validationResult(req).array();
 
-  if (!user) {
-    throw new InvalidInput([
-      {
-        location: 'params',
-        value: req.params.username,
-        param: 'username',
-        msg: 'User was not found.'
-      }
-    ]);
+  if (!updatedUser) {
+    errors.push({
+      location: 'params',
+      value: req.params.username,
+      param: 'username',
+      msg: 'User was not found.'
+    });
   }
 
-  return res.status(200).send(user);
+  if (errors.length > 0) {
+    throw new InvalidInput(errors);
+  }
+
+  return res.status(200).send(updatedUser);
 }
 
-export async function getUsers(req: Request, res: Response): Promise<Response<UserDocument[]>> {
+export async function partiallyUpdateAuthUser(
+  req: Request,
+  res: Response
+): Promise<Response<UserDocument>> {
+  const errors = validationResult(req).array();
+  const updatedUser = await userService.partiallyUpdate(req.userId!, req.body);
+
+  if (!updatedUser) {
+    errors.push({
+      location: 'params',
+      value: req.params.username,
+      param: 'username',
+      msg: 'User was not found.'
+    });
+  }
+
+  if (errors.length > 0) {
+    throw new InvalidInput(errors);
+  }
+
+  return res.status(200).send(updatedUser);
+}
+
+// eslint-disable-next-line consistent-return
+export async function getUsers(
+  req: Request,
+  res: Response
+): Promise<Response<UserDocument[]> | undefined> {
   const { limit, offset, search, ordering } = getPaginationParamsFromRequest(req);
 
-  const users = await User.find({ username: new RegExp(search || '', 'i') })
-    .limit(limit)
-    .skip(offset)
-    .sort(ordering);
-
-  const paginatedResultEvent = new PaginatedResultEvent({
-    items: users,
-    count: await User.countDocuments({ username: new RegExp(search || '', 'i') }),
-    offset,
-    limit,
+  const { paginatedResultEvent } = await userService.getPaginatedResult(
+    { limit, offset, ordering, search },
     req,
-    search
-  });
+    'username',
+    '-password'
+  );
 
   return res
     .status(paginatedResultEvent.getStatusCode())
@@ -87,7 +108,7 @@ export async function changeCurrentUserPassword(
   res: Response
 ): Promise<Response<UserDocument>> {
   const errors = validationResult(req).array();
-  const user = await User.findById(req.userId);
+  const user = await userService.findOne({ id: req.userId });
   const { oldPassword, password } = req.body;
 
   if (!user) {

@@ -23,7 +23,7 @@ describe('tests the email verification route', () => {
     await request(app)
       .post(VERIFY_ROUTE)
       .send({ emailVerificationToken: generateEmailVerificationToken() })
-      .expect(500);
+      .expect(404);
   });
 
   it('should mark the user as verified on matching verification token', async () => {

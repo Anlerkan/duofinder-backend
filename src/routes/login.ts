@@ -1,24 +1,11 @@
 import express from 'express';
-import { body } from 'express-validator';
 
 import { LOGIN_ROUTE } from './route-defs';
 import { login } from '../controllers/auth.controller';
+import validateRequiredFieldsSchema from '../validation/validateRequiredFieldsSchema';
 
 const loginRouter = express.Router();
 
-loginRouter.post(
-  LOGIN_ROUTE,
-  [
-    body('email')
-      .not()
-      .isEmpty({ ignore_whitespace: true })
-      .withMessage('Email field may not be blank.'),
-    body('password')
-      .not()
-      .isEmpty({ ignore_whitespace: true })
-      .withMessage('Password field may not be blank.')
-  ],
-  login
-);
+loginRouter.post(LOGIN_ROUTE, [validateRequiredFieldsSchema(['email', 'password'])], login);
 
 export default loginRouter;

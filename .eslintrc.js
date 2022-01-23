@@ -23,6 +23,7 @@ module.exports = {
         "no-underscore-dangle": ["error", { "allow": ["_id", "_update"] }],
         'class-methods-use-this': 'off',
         '@typescript-eslint/no-non-null-assertion': 'off',
+        "@typescript-eslint/explicit-module-boundary-types": "off",
     },
     ignorePatterns: ['.eslintrc.js'],
 };

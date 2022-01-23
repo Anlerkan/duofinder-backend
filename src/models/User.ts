@@ -63,13 +63,11 @@ async function validateUniqueness(userDoc: UserDocument) {
   // eslint-disable-next-line @typescript-eslint/no-use-before-define
   const existingUsername = await User.findOne({ username: userDoc.username });
 
-  const { isVerified } = userDoc;
-
-  if (existingEmail && !isVerified) {
+  if (existingEmail) {
     throw new DuplicatedEmail();
   }
 
-  if (existingUsername && !isVerified) {
+  if (existingUsername) {
     throw new DuplicatedUsername();
   }
 }
