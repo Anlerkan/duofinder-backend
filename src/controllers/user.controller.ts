@@ -9,7 +9,7 @@ import { getPaginationParamsFromRequest } from '../utils/pagination/getPaginatio
 
 export async function getLoggedInUser(req: Request, res: Response) {
   const errors = validationResult(req).array();
-  const user = await userService.findOne({ _id: req.userId }, '-password');
+  const user = await userService.findOne({ _id: req.userId });
 
   if (errors.length > 0) {
     throw new InvalidInput(errors);
@@ -94,8 +94,7 @@ export async function getUsers(
   const { paginatedResultEvent } = await userService.getPaginatedResult(
     { limit, offset, ordering, search },
     req,
-    'username',
-    '-password'
+    'username'
   );
 
   return res

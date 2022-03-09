@@ -12,7 +12,7 @@ export type GameDocument = mongoose.Document & {
 
 export type GameModel = mongoose.Model<GameDocument>;
 
-const gameSchema = new mongoose.Schema({
+export const gameSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true
@@ -28,7 +28,8 @@ const gameSchema = new mongoose.Schema({
   categories: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Category'
+      ref: 'Category',
+      default: []
     }
   ]
 });

@@ -1,7 +1,5 @@
 import mongoose, { UpdateQuery } from 'mongoose';
 
-import { DuplicatedEmail } from '../errors';
-import DuplicatedUsername from '../errors/duplicated-username';
 import { PasswordHash } from '../utils';
 import { GameDocument } from './Game';
 
@@ -11,8 +9,9 @@ export type UserDocument = mongoose.Document & {
   username: string;
   isAdmin: boolean;
   games: GameDocument[];
-  nextOnboardingStep: 'personal-info' | 'connect-platforms' | 'select-games';
+  nextOnboardingStep: 'personal-info' | 'connect-platforms' | 'select-games' | 'complete';
   isVerified?: boolean;
+  bio?: string;
 };
 
 export type UserModel = mongoose.Model<UserDocument>;
@@ -54,40 +53,19 @@ const userSchema = new mongoose.Schema<UserDocument>({
       ref: 'Game',
       default: []
     }
-  ]
+  ],
+  bio: {
+    type: String,
+    default: '',
+    required: false
+  }
 });
-
-async function validateUniqueness(userDoc: UserDocument) {
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  const existingEmail = await User.findOne({ email: userDoc.email });
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
-  const existingUsername = await User.findOne({ username: userDoc.username });
-
-  if (existingEmail) {
-    throw new DuplicatedEmail();
-  }
-
-  if (existingUsername) {
-    throw new DuplicatedUsername();
-  }
-}
 
 function hashPassword(newPassword: string): string {
   const hashedPassword = PasswordHash.toHashSync({ password: newPassword });
 
   return hashedPassword;
 }
-
-userSchema.pre('save', async function preValidateUniqueness(this: UserDocument) {
-  await validateUniqueness(this);
-});
-
-userSchema.pre(
-  /^.*([Uu]pdate).*$/,
-  async function preValidateUniqueness(this: UpdateQuery<UserDocument>) {
-    await validateUniqueness(this._update);
-  }
-);
 
 userSchema.pre('save', async function setIsVerifiedToFalseOnFirstSave(this: UserDocument) {
   // eslint-disable-next-line @typescript-eslint/no-use-before-define

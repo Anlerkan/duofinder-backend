@@ -1,10 +1,7 @@
 import { BaseEvent } from './base-event';
 import { UserDocument } from '../models/User';
 
-export type UserLoggedInRestPayload = {
-  id: string;
-  status: string;
-};
+export type UserLoggedInRestPayload = UserDocument;
 
 export default class UserLoggedIn extends BaseEvent<UserLoggedInRestPayload> {
   private user: UserDocument;
@@ -21,9 +18,6 @@ export default class UserLoggedIn extends BaseEvent<UserLoggedInRestPayload> {
   }
 
   serializeRest(): UserLoggedInRestPayload {
-    return {
-      id: this.user._id,
-      status: 'Success'
-    };
+    return this.user;
   }
 }

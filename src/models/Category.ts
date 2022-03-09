@@ -8,7 +8,7 @@ export type CategoryDocument = mongoose.Document & {
 
 export type CategoryModel = mongoose.Model<CategoryDocument>;
 
-const categoryScheme = new mongoose.Schema({
+const categorySchema = new mongoose.Schema({
   name: {
     type: String,
     required: true
@@ -36,17 +36,17 @@ async function validateUniqueness(categoryDoc: CategoryDocument) {
   }
 }
 
-categoryScheme.pre('save', async function preValidateUniqueness(this: CategoryDocument) {
+categorySchema.pre('save', async function preValidateUniqueness(this: CategoryDocument) {
   await validateUniqueness(this);
 });
 
-categoryScheme.pre(
+categorySchema.pre(
   /^.*([Uu]pdate).*$/,
   async function preValidateUniqueness(this: UpdateQuery<CategoryDocument>) {
     await validateUniqueness(this._update);
   }
 );
 
-const Category = mongoose.model<CategoryDocument, CategoryModel>('Category', categoryScheme);
+const Category = mongoose.model<CategoryDocument, CategoryModel>('Category', categorySchema);
 
 export default Category;

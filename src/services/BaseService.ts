@@ -7,16 +7,22 @@ import { PaginationParams } from '../utils/pagination/paginationTypes';
 abstract class BaseService<T extends Document<unknown>> {
   Model: Model<T>;
 
-  constructor(model: Model<T>) {
+  select: string | undefined = undefined;
+
+  populate: string | undefined = undefined;
+
+  constructor(model: Model<T>, select?: string, populate?: string) {
     this.Model = model;
+    this.select = select;
+    this.populate = populate;
   }
 
-  async getAll(select?: string) {
-    return this.Model.find({}).select(select);
+  async getAll() {
+    return this.Model.find({}).populate(this.populate).select(this.select);
   }
 
-  async findOne(options: FilterQuery<T>, select?: string): Promise<T | null> {
-    return this.Model.findOne(options).select(select);
+  async findOne(options: FilterQuery<T>): Promise<T | null> {
+    return this.Model.findOne(options).populate(this.populate).select(this.select);
   }
 
   async create(data: Partial<T>): Promise<T> {
@@ -24,11 +30,15 @@ abstract class BaseService<T extends Document<unknown>> {
   }
 
   async update(id: string, options: FilterQuery<T>): Promise<T | null> {
-    return this.Model.findByIdAndUpdate(id, options, { new: true, runValidators: true });
+    return this.Model.findByIdAndUpdate(id, options, { new: true, runValidators: true })
+      .populate(this.populate)
+      .select(this.select);
   }
 
   async partiallyUpdate(id: string | ObjectId, payload: UpdateQuery<T>): Promise<T | null> {
-    return this.Model.findByIdAndUpdate(id, { ...payload }, { new: true, runValidators: true });
+    return this.Model.findByIdAndUpdate(id, { ...payload }, { new: true, runValidators: true })
+      .populate(this.populate)
+      .select(this.select);
   }
 
   async delete(id: string | ObjectId): Promise<T | null> {
@@ -38,8 +48,7 @@ abstract class BaseService<T extends Document<unknown>> {
   async getPaginatedResult(
     params: PaginationParams,
     req: Request,
-    searchKey: keyof T,
-    select?: string
+    searchKey: keyof T
   ): Promise<{ items: T[]; paginatedResultEvent: PaginatedResultEvent<T> }> {
     const { limit, offset, ordering, search } = params;
 
@@ -49,7 +58,8 @@ abstract class BaseService<T extends Document<unknown>> {
       .limit(limit)
       .skip(offset)
       .sort(ordering)
-      .select(select);
+      .populate(this.populate)
+      .select(this.select);
 
     const paginatedResultEvent = new PaginatedResultEvent<T>({
       items,

@@ -5,6 +5,7 @@ import { signup } from '../controllers/auth.controller';
 import validateEmailSchema from '../validation/validateEmailSchema';
 import validatePasswordSchema from '../validation/validatePasswordSchema';
 import validateRequiredFieldsSchema from '../validation/validateRequiredFieldsSchema';
+import { validateUniqueUser } from '../middlewares';
 
 const signUpRouter = express.Router();
 
@@ -13,7 +14,8 @@ signUpRouter.post(
   [
     validateEmailSchema(),
     validatePasswordSchema(),
-    validateRequiredFieldsSchema(['username', 'email', 'password'])
+    validateRequiredFieldsSchema(['username', 'email', 'password']),
+    validateUniqueUser
   ],
   signup
 );

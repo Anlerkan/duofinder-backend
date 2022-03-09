@@ -1,5 +1,5 @@
 import express from 'express';
-import { json } from 'body-parser';
+import { json, text } from 'body-parser';
 import 'express-async-errors';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -18,7 +18,8 @@ const options: cors.CorsOptions = {
 };
 
 app.use(cors(options));
-app.use(json());
+app.use(json({ limit: '200mb' }));
+app.use(text({ limit: '200mb' }));
 app.use(cookieParser());
 
 app.use(signUpRouter);

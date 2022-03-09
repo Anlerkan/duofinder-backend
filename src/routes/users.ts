@@ -14,7 +14,7 @@ import {
   partiallyUpdateAuthUser,
   updateAuthUser
 } from '../controllers/user.controller';
-import { validateToken } from '../middlewares';
+import { validateToken, validateUniqueUser } from '../middlewares';
 import validatePasswordSchema from '../validation/validatePasswordSchema';
 import validateEmailSchema from '../validation/validateEmailSchema';
 
@@ -23,8 +23,12 @@ const usersRouter = express.Router();
 usersRouter.get(USERS_ROUTE, validateToken, getUsers);
 
 usersRouter.get(USERS_ME_ROUTE, validateToken, getLoggedInUser);
-usersRouter.patch(USERS_ME_ROUTE, [validateEmailSchema(), validateToken], partiallyUpdateAuthUser);
-usersRouter.put(USERS_ME_ROUTE, [validateEmailSchema(), validateToken], updateAuthUser);
+usersRouter.patch(USERS_ME_ROUTE, [validateToken], partiallyUpdateAuthUser);
+usersRouter.put(
+  USERS_ME_ROUTE,
+  [validateUniqueUser, validateEmailSchema(), validateToken],
+  updateAuthUser
+);
 usersRouter.post(
   USER_CHANGE_CURRENT_USER_PASSWORD_ROUTE,
   [validatePasswordSchema(), validateToken],
