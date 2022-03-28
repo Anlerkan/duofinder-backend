@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "es6",
+        "target": "ES2019",
         "module": "commonjs",
         "rootDir": "./",
         "outDir": "./build",
@@ -9,6 +9,9 @@
         "skipLibCheck": true,
         "sourceMap": true,
         "forceConsistentCasingInFileNames": true,
-        "typeRoots": ["./src/types","./node_modules/@types"]
+        "typeRoots": ["./src/types","./node_modules/@types"],
+        "lib": [
+            "ES2019"
+        ]
     }
 }

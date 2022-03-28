@@ -1,7 +1,8 @@
 import { BaseEvent } from './base-event';
-import { UserDocument } from '../models/User';
+import { IUser, UserDocument } from '../models/User';
+import { omitKeys } from '../utils/object/objectUtils';
 
-export type UserLoggedInRestPayload = UserDocument;
+export type UserLoggedInRestPayload = Omit<IUser, 'password'>;
 
 export default class UserLoggedIn extends BaseEvent<UserLoggedInRestPayload> {
   private user: UserDocument;
@@ -18,6 +19,8 @@ export default class UserLoggedIn extends BaseEvent<UserLoggedInRestPayload> {
   }
 
   serializeRest(): UserLoggedInRestPayload {
-    return this.user;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore DADAF
+    return omitKeys(this.user.toObject(), 'password');
   }
 }

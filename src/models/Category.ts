@@ -1,10 +1,12 @@
 import mongoose, { UpdateQuery } from 'mongoose';
 import { InvalidInput } from '../errors';
 
-export type CategoryDocument = mongoose.Document & {
+export type ICategory = {
   name: string;
   description: string;
 };
+
+export type CategoryDocument = mongoose.Document & ICategory;
 
 export type CategoryModel = mongoose.Model<CategoryDocument>;
 

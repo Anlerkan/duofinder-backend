@@ -3,7 +3,7 @@ import BaseService from './BaseService';
 
 class UserService extends BaseService<UserDocument> {
   constructor() {
-    super(User, '-password', 'games');
+    super(User, '-password', { path: 'games', select: '-password' });
   }
 }
 

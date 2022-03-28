@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { ObjectId } from 'mongodb';
-import { FilterQuery, Model, Document, UpdateQuery } from 'mongoose';
+import { FilterQuery, Model, Document, UpdateQuery, PopulateOptions } from 'mongoose';
 import PaginatedResultEvent from '../events/paginated-result';
 import { PaginationParams } from '../utils/pagination/paginationTypes';
 
@@ -9,16 +9,16 @@ abstract class BaseService<T extends Document<unknown>> {
 
   select: string | undefined = undefined;
 
-  populate: string | undefined = undefined;
+  populate: PopulateOptions | PopulateOptions[] | undefined = undefined;
 
-  constructor(model: Model<T>, select?: string, populate?: string) {
+  constructor(model: Model<T>, select?: string, populate?: PopulateOptions | PopulateOptions[]) {
     this.Model = model;
     this.select = select;
     this.populate = populate;
   }
 
-  async getAll() {
-    return this.Model.find({}).populate(this.populate).select(this.select);
+  async getAll(options: FilterQuery<T>) {
+    return this.Model.find(options).populate(this.populate).select(this.select);
   }
 
   async findOne(options: FilterQuery<T>): Promise<T | null> {
@@ -55,10 +55,10 @@ abstract class BaseService<T extends Document<unknown>> {
     const items = await this.Model.find({
       [searchKey]: new RegExp(search || '', 'i')
     } as FilterQuery<T>)
+      .populate(this.populate)
       .limit(limit)
       .skip(offset)
       .sort(ordering)
-      .populate(this.populate)
       .select(this.select);
 
     const paginatedResultEvent = new PaginatedResultEvent<T>({

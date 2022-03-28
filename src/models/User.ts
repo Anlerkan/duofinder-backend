@@ -1,22 +1,25 @@
 import mongoose, { UpdateQuery } from 'mongoose';
 
 import { PasswordHash } from '../utils';
-import { GameDocument } from './Game';
+import { IGame } from './Game';
 
-export type UserDocument = mongoose.Document & {
+export type IUser = {
   email: string;
   password: string;
   username: string;
   isAdmin: boolean;
-  games: GameDocument[];
+  games: IGame[];
   nextOnboardingStep: 'personal-info' | 'connect-platforms' | 'select-games' | 'complete';
   isVerified?: boolean;
   bio?: string;
+  avatar?: string;
 };
+
+export type UserDocument = mongoose.Document & IUser;
 
 export type UserModel = mongoose.Model<UserDocument>;
 
-const userSchema = new mongoose.Schema<UserDocument>({
+const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true

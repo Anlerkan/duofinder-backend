@@ -3,7 +3,7 @@ import BaseService from './BaseService';
 
 class GameService extends BaseService<GameDocument> {
   constructor() {
-    super(Game, 'name', 'categories');
+    super(Game, undefined, { path: 'categories' });
   }
 }
 

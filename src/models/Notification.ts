@@ -1,11 +1,13 @@
 import mongoose from 'mongoose';
 
-export type NotificationDocument = mongoose.Document & {
+export type INotification = {
   createdBy: string;
   createdAt: string;
   message: string;
   is_seen: boolean;
 };
+
+export type NotificationDocument = mongoose.Document & INotification;
 
 export type NotificationModel = mongoose.Model<NotificationDocument>;
 

@@ -4,7 +4,15 @@ import 'express-async-errors';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
-import { signUpRouter, verifyRouter, loginRouter, usersRouter, gamesRouter } from './routes';
+import {
+  signUpRouter,
+  verifyRouter,
+  loginRouter,
+  usersRouter,
+  gamesRouter,
+  categoriesRouter,
+  postRouter
+} from './routes';
 import { errorHandler } from './middlewares';
 
 const app = express();
@@ -27,6 +35,8 @@ app.use(verifyRouter);
 app.use(loginRouter);
 app.use(usersRouter);
 app.use(gamesRouter);
+app.use(categoriesRouter);
+app.use(postRouter);
 
 app.use(errorHandler);
 

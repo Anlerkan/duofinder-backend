@@ -9,16 +9,16 @@ import { Jwt } from '../utils/jwt';
 import { UserSignedUp } from '../events';
 import { generateEmailVerificationToken } from '../utils/account-verification';
 import UserVerified from '../events/user-verified';
-import userService from '../services/UserService';
 import accountVerificationService from '../services/AccountVerificationService';
 import NotFoundError from '../errors/not-found';
+import authService from '../services/AuthService';
 
 export async function login(req: Request, res: Response) {
   const errors = validationResult(req).array();
 
   const { email, password } = req.body;
 
-  const user = await userService.findOne({ email });
+  const user = await authService.findOne({ email });
 
   if (!user) {
     errors.push({
@@ -97,7 +97,7 @@ export async function signup(req: Request, res: Response) {
 
   const { email, password, username } = req.body;
 
-  const newUser = await userService.create({ email, password, username });
+  const newUser = await authService.create({ email, password, username });
   const emailVerificationToken = generateEmailVerificationToken();
 
   const accountVerification = await AccountVerification.create({
@@ -131,7 +131,7 @@ export async function verifyUser(req: Request, res: Response) {
     throw new NotFoundError('Email verification token is invalid or expired');
   }
 
-  const user = await userService.partiallyUpdate(verificationDoc.userId, { isVerified: true });
+  const user = await authService.partiallyUpdate(verificationDoc.userId, { isVerified: true });
 
   if (!user) {
     throw new NotFoundError('User with the corresponding verification token was not found');
