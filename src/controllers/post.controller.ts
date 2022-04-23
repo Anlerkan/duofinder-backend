@@ -5,7 +5,8 @@ import { FilterQuery, ObjectId } from 'mongoose';
 import { InvalidInput } from '../errors';
 import NotFoundError from '../errors/not-found';
 import PaginatedResultEvent from '../events/paginated-result';
-import { IPost, Like, Post, PostDocument, PostResponse } from '../models';
+import { IPost, Post, PostDocument, PostResponse } from '../models';
+import likeService from '../services/LikeService';
 import postService from '../services/PostService';
 import userService from '../services/UserService';
 import { getPaginationParamsFromRequest } from '../utils/pagination/getPaginationParamsFromRequest';
@@ -22,28 +23,25 @@ export async function getPosts(req: Request, res: Response) {
     .sort(ordering)
     .populate('author');
 
-  const isLikedByViewer =
-    Boolean(currentUser) &&
-    Boolean(
-      await Like.find({
-        createdBy: currentUser!._id,
-        post: { $in: posts.map((post) => post._id) }
-      })
-    );
+  const serializedPosts: PostResponse[] = await Promise.all(
+    posts.map(async (post) => {
+      const { _id: id, likeCount, commentCount, content, author, createdAt } = post;
 
-  const serializedPosts: PostResponse[] = posts.map((post) => {
-    const { _id: id, likeCount, commentCount, content, author, createdAt } = post;
+      const isLikedByViewer =
+        Boolean(currentUser) &&
+        (await likeService.isLikedByUser((post._id as unknown) as ObjectId, currentUser!));
 
-    return {
-      author,
-      content,
-      createdAt,
-      id,
-      likeCount,
-      likedByViewer: isLikedByViewer,
-      commentCount
-    };
-  });
+      return {
+        author,
+        content,
+        createdAt,
+        id,
+        likeCount,
+        likedByViewer: isLikedByViewer,
+        commentCount
+      };
+    })
+  );
 
   const paginatedResultEvent = new PaginatedResultEvent<PostResponse>({
     items: serializedPosts,
@@ -76,7 +74,17 @@ export async function addPost(req: Request<any, IPost, Omit<IPost, 'createdAt'>>
     author: currentUser!
   });
 
-  return res.status(200).send(newPost);
+  const { _id: id, likeCount, commentCount, content: postContent, author, createdAt } = newPost;
+
+  return res.status(200).send({
+    author,
+    content: postContent,
+    createdAt,
+    id,
+    likeCount,
+    likedByViewer: false,
+    commentCount
+  });
 }
 
 export async function getPostById(req: Request, res: Response) {
@@ -89,12 +97,7 @@ export async function getPostById(req: Request, res: Response) {
 
   const isLikedByViewer =
     Boolean(currentUser) &&
-    Boolean(
-      await Like.find({
-        createdBy: currentUser!._id,
-        post: post._id
-      })
-    );
+    (await likeService.isLikedByUser((req.params.id as unknown) as ObjectId, currentUser!));
 
   const { _id: id, likeCount, commentCount, content, author, createdAt } = post;
 
@@ -116,13 +119,9 @@ export async function likePost(req: Request, res: Response) {
     throw new NotFoundError('User not found');
   }
 
-  const likedPost = await postService.likePost(req.params.id, currentUser);
+  const likedPost = await postService.likePost((req.params.id as unknown) as ObjectId, currentUser);
 
-  if (!likedPost) {
-    throw new NotFoundError('Post not found');
-  }
-
-  const { _id: id, likeCount, commentCount, content, author, createdAt } = likedPost;
+  const { _id: id, likeCount, commentCount, content, author, createdAt } = likedPost!;
 
   return res.status(200).send({
     author,

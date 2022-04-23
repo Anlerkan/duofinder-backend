@@ -14,6 +14,7 @@ import {
   postRouter
 } from './routes';
 import { errorHandler } from './middlewares';
+import notificationRouter from './routes/notification';
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use(usersRouter);
 app.use(gamesRouter);
 app.use(categoriesRouter);
 app.use(postRouter);
+app.use(notificationRouter);
 
 app.use(errorHandler);
 

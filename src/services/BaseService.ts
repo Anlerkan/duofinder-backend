@@ -48,12 +48,14 @@ abstract class BaseService<T extends Document<unknown>> {
   async getPaginatedResult(
     params: PaginationParams,
     req: Request,
-    searchKey: keyof T
+    searchKey: keyof T,
+    filterQuery?: FilterQuery<T>
   ): Promise<{ items: T[]; paginatedResultEvent: PaginatedResultEvent<T> }> {
     const { limit, offset, ordering, search } = params;
 
     const items = await this.Model.find({
-      [searchKey]: new RegExp(search || '', 'i')
+      [searchKey]: new RegExp(search || '', 'i'),
+      ...filterQuery
     } as FilterQuery<T>)
       .populate(this.populate)
       .limit(limit)
@@ -64,7 +66,8 @@ abstract class BaseService<T extends Document<unknown>> {
     const paginatedResultEvent = new PaginatedResultEvent<T>({
       items,
       count: await this.Model.countDocuments({
-        [searchKey]: new RegExp(search || '', 'i')
+        [searchKey]: new RegExp(search || '', 'i'),
+        ...filterQuery
       } as FilterQuery<T>),
       offset,
       limit,

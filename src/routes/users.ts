@@ -1,17 +1,24 @@
 import express from 'express';
 
 import {
+  RECOMMENDED_USERS_ROUTE,
   USERS_ME_ROUTE,
   USERS_ROUTE,
   USER_CHANGE_CURRENT_USER_PASSWORD_ROUTE,
+  USER_DETAIL_ID_ROUTE,
   USER_DETAIL_ROUTE
 } from './route-defs';
 import {
+  acceptFriendRequest,
   changeCurrentUserPassword,
+  getCurrentUserFriends,
+  getFriendRequestsReceived,
   getLoggedInUser,
+  getRecommendedUsers,
   getUserByUsername,
   getUsers,
   partiallyUpdateAuthUser,
+  sendFriendRequest,
   updateAuthUser
 } from '../controllers/user.controller';
 import { validateToken, validateUniqueUser } from '../middlewares';
@@ -21,6 +28,7 @@ import validateEmailSchema from '../validation/validateEmailSchema';
 const usersRouter = express.Router();
 
 usersRouter.get(USERS_ROUTE, validateToken, getUsers);
+usersRouter.get(RECOMMENDED_USERS_ROUTE, validateToken, getRecommendedUsers);
 
 usersRouter.get(USERS_ME_ROUTE, validateToken, getLoggedInUser);
 usersRouter.patch(USERS_ME_ROUTE, [validateToken], partiallyUpdateAuthUser);
@@ -36,5 +44,20 @@ usersRouter.post(
 );
 
 usersRouter.get(USER_DETAIL_ROUTE, getUserByUsername);
+
+usersRouter.get(
+  `${USER_DETAIL_ROUTE}/received-friend-requests`,
+  validateToken,
+  getFriendRequestsReceived
+);
+
+usersRouter.post(`${USER_DETAIL_ID_ROUTE}/send-friend-request`, validateToken, sendFriendRequest);
+usersRouter.post(
+  `${USER_DETAIL_ID_ROUTE}/accept-friend-request`,
+  validateToken,
+  acceptFriendRequest
+);
+
+usersRouter.get(`${USERS_ME_ROUTE}friends`, validateToken, getCurrentUserFriends);
 
 export default usersRouter;

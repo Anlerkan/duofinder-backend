@@ -37,7 +37,7 @@ export const PostSchema = new mongoose.Schema({
   createdAt: {
     type: String,
     required: true,
-    default: new Date().toString()
+    default: new Date().toLocaleString()
   },
   likeCount: {
     type: Number,

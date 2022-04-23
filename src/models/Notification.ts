@@ -1,10 +1,11 @@
-import mongoose from 'mongoose';
+import mongoose, { ObjectId } from 'mongoose';
 
 export type INotification = {
-  createdBy: string;
+  createdBy: ObjectId;
   createdAt: string;
   message: string;
   is_seen: boolean;
+  user: ObjectId;
 };
 
 export type NotificationDocument = mongoose.Document & INotification;
@@ -24,7 +25,7 @@ const notificationSchema = new mongoose.Schema<NotificationDocument, Notificatio
   createdAt: {
     type: String,
     required: true,
-    default: new Date().getDate().toString()
+    default: new Date().toLocaleString()
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,

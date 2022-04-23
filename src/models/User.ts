@@ -13,6 +13,9 @@ export type IUser = {
   isVerified?: boolean;
   bio?: string;
   avatar?: string;
+  friendRequestsSent: IUser[];
+  friendRequestsReceived: IUser[];
+  friends: IUser[];
 };
 
 export type UserDocument = mongoose.Document & IUser;
@@ -61,8 +64,41 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: '',
     required: false
-  }
+  },
+  friends: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: []
+    }
+  ],
+  friendRequestsSent: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: []
+    }
+  ],
+  friendRequestsReceived: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: []
+    }
+  ],
+  notifications: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Notification',
+      default: []
+    }
+  ]
 });
+
+export type UserResponse = Pick<
+  IUser,
+  'avatar' | 'bio' | 'email' | 'isVerified' | 'username' | 'isAdmin' | 'nextOnboardingStep'
+>;
 
 function hashPassword(newPassword: string): string {
   const hashedPassword = PasswordHash.toHashSync({ password: newPassword });

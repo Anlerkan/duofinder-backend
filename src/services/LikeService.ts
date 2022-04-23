@@ -8,7 +8,7 @@ class LikeService extends BaseService<LikeDocument> {
   }
 
   async isLikedByUser(postId: ObjectId, user: UserDocument) {
-    const like = await this.findOne({ postId, createdBy: user });
+    const like = await this.findOne({ postId, createdBy: user._id });
 
     return Boolean(like);
   }
