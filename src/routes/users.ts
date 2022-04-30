@@ -5,8 +5,10 @@ import {
   USERS_ME_ROUTE,
   USERS_ROUTE,
   USER_CHANGE_CURRENT_USER_PASSWORD_ROUTE,
+  USER_CURRENT_USER_POSTS,
   USER_DETAIL_ID_ROUTE,
-  USER_DETAIL_ROUTE
+  USER_DETAIL_ROUTE,
+  USER_POSTS
 } from './route-defs';
 import {
   acceptFriendRequest,
@@ -24,6 +26,7 @@ import {
 import { validateToken, validateUniqueUser } from '../middlewares';
 import validatePasswordSchema from '../validation/validatePasswordSchema';
 import validateEmailSchema from '../validation/validateEmailSchema';
+import { getCurrentUserPosts, getPostsByUser } from '../controllers/post.controller';
 
 const usersRouter = express.Router();
 
@@ -42,6 +45,9 @@ usersRouter.post(
   [validatePasswordSchema(), validateToken],
   changeCurrentUserPassword
 );
+
+usersRouter.get(USER_CURRENT_USER_POSTS, validateToken, getCurrentUserPosts);
+usersRouter.get(USER_POSTS, validateToken, getPostsByUser);
 
 usersRouter.get(USER_DETAIL_ROUTE, getUserByUsername);
 

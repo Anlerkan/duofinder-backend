@@ -168,3 +168,45 @@ export async function getLikedUsers(req: Request, res: Response) {
 
   return res.status(200).send(likedUsers);
 }
+
+export async function getCurrentUserPosts(req: Request, res: Response) {
+  const currentUser = await userService.findOne({ _id: req.userId });
+
+  if (!currentUser) {
+    throw new NotFoundError('User not found');
+  }
+
+  const { paginatedResultEvent } = await postService.getPaginatedResult(
+    getPaginationParamsFromRequest(req),
+    req,
+    'content',
+    {
+      author: currentUser._id
+    }
+  );
+
+  return res
+    .status(paginatedResultEvent.getStatusCode())
+    .send(paginatedResultEvent.serializeRest());
+}
+
+export async function getPostsByUser(req: Request, res: Response) {
+  const user = await userService.findOne({ username: req.params.username });
+
+  if (!user) {
+    throw new NotFoundError('User not found');
+  }
+
+  const { paginatedResultEvent } = await postService.getPaginatedResult(
+    getPaginationParamsFromRequest(req),
+    req,
+    'content',
+    {
+      author: user._id
+    }
+  );
+
+  return res
+    .status(paginatedResultEvent.getStatusCode())
+    .send(paginatedResultEvent.serializeRest());
+}

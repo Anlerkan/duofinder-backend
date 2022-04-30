@@ -4,7 +4,8 @@ import { ObjectId } from 'mongoose';
 
 import { InvalidInput } from '../errors';
 import Unauthorized from '../errors/unauthorized';
-import { UserDocument, UserResponse } from '../models';
+import { Post, UserDocument, UserResponse } from '../models';
+import postService from '../services/PostService';
 import userService from '../services/UserService';
 import { getPaginationParamsFromRequest } from '../utils/pagination/getPaginationParamsFromRequest';
 

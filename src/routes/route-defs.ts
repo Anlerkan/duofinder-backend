@@ -7,6 +7,8 @@ export const USERS_ME_ROUTE = '/api/users/me/';
 export const USER_DETAIL_ROUTE = '/api/users/:username';
 export const USER_CHANGE_CURRENT_USER_PASSWORD_ROUTE = '/api/users/me/change-password';
 export const USER_DETAIL_ID_ROUTE = '/api/users/:id';
+export const USER_POSTS = '/api/users/:username/posts';
+export const USER_CURRENT_USER_POSTS = '/api/users/me/posts';
 export const RECOMMENDED_USERS_ROUTE = '/api/recommended-users';
 
 export const GAMES_ROUTE = '/api/games/';
