@@ -20,6 +20,8 @@ import {
   getUserByUsername,
   getUsers,
   partiallyUpdateAuthUser,
+  rejectFriendRequest,
+  removeFriendRequest,
   sendFriendRequest,
   updateAuthUser
 } from '../controllers/user.controller';
@@ -62,6 +64,16 @@ usersRouter.post(
   `${USER_DETAIL_ID_ROUTE}/accept-friend-request`,
   validateToken,
   acceptFriendRequest
+);
+usersRouter.post(
+  `${USER_DETAIL_ID_ROUTE}/reject-friend-request`,
+  validateToken,
+  rejectFriendRequest
+);
+usersRouter.post(
+  `${USER_DETAIL_ID_ROUTE}/remove-friend-request`,
+  validateToken,
+  removeFriendRequest
 );
 
 usersRouter.get(`${USERS_ME_ROUTE}friends`, validateToken, getCurrentUserFriends);

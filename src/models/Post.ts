@@ -11,7 +11,7 @@ export type IPost = {
 };
 
 export type PostResponse = {
-  id: string;
+  _id: string;
   author: IUser;
   content: string;
   createdAt: string;

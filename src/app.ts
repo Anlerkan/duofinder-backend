@@ -3,7 +3,7 @@ import { json, text } from 'body-parser';
 import 'express-async-errors';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-
+import { createClient } from 'redis';
 import {
   signUpRouter,
   verifyRouter,

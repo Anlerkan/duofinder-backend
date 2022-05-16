@@ -10,7 +10,7 @@ export const NOTIFICATION_MESSAGES = {
 
 class NotificationService extends BaseService<NotificationDocument> {
   constructor() {
-    super(Notification);
+    super(Notification, undefined, { path: 'createdBy' });
   }
 }
 

@@ -20,7 +20,7 @@ export const likeSchema = new mongoose.Schema<LikeDocument, LikeModel, ILike>({
   createdAt: {
     type: String,
     required: true,
-    default: new Date().getDate().toString()
+    default: new Date().toLocaleString()
   },
   postId: {
     type: mongoose.Schema.Types.ObjectId,

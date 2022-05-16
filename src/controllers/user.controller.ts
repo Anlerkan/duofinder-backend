@@ -212,6 +212,15 @@ export async function rejectFriendRequest(
   return res.status(200).send(newUser);
 }
 
+export async function removeFriendRequest(req: Request, res: Response) {
+  const newUser = await userService.removeFriendRequest(
+    (req.userId! as unknown) as ObjectId,
+    (req.params.id as unknown) as ObjectId
+  );
+
+  return res.status(200).send(newUser);
+}
+
 export async function getRecommendedUsers(
   req: Request,
   res: Response

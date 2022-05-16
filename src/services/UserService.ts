@@ -99,6 +99,25 @@ class UserService extends BaseService<UserDocument> {
     return user;
   }
 
+  async removeFriendRequest(userId: ObjectId, friendId: ObjectId) {
+    const user = await this.findOne({ _id: userId });
+
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+
+    const updatedUser = this.partiallyUpdate((userId as unknown) as string, {
+      $pull: { friendRequestsSent: friendId }
+    });
+
+    // await User.updateOne({_id:userId}, {$pull: {friendRequestsSent: friendId}});
+
+    // user.friendRequestsSent.filter((fr) => fr.toString() !== friendId.toString());
+    // await user.save();
+
+    return updatedUser;
+  }
+
   async removeFriend(userId: string, friendId: string) {
     const user = await this.findOne({ _id: userId });
 
@@ -168,7 +187,7 @@ class UserService extends BaseService<UserDocument> {
     }
 
     const paginatedResult = this.getPaginatedResult(params, req, 'username', {
-      _id: { $nin: user.friends }
+      _id: { $nin: [...user.friends, ...user.friendRequestsSent] }
     });
 
     return paginatedResult;

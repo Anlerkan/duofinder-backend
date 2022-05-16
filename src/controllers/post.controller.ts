@@ -25,7 +25,8 @@ export async function getPosts(req: Request, res: Response) {
 
   const serializedPosts: PostResponse[] = await Promise.all(
     posts.map(async (post) => {
-      const { _id: id, likeCount, commentCount, content, author, createdAt } = post;
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const { _id, likeCount, commentCount, content, author, createdAt } = post;
 
       const isLikedByViewer =
         Boolean(currentUser) &&
@@ -35,7 +36,7 @@ export async function getPosts(req: Request, res: Response) {
         author,
         content,
         createdAt,
-        id,
+        _id,
         likeCount,
         likedByViewer: isLikedByViewer,
         commentCount

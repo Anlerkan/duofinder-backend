@@ -20,7 +20,7 @@ export const commentSchema = new mongoose.Schema<CommentDocument, CommentModel, 
   createdAt: {
     type: String,
     required: true,
-    default: new Date().getDate().toString()
+    default: new Date().toLocaleString()
   },
   content: {
     type: String,
