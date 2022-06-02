@@ -51,6 +51,9 @@ class UserService extends BaseService<UserDocument> {
     user.friendRequestsSent.push(friend);
     await user.save();
 
+    friend.friendRequestsReceived.push(user._id);
+    await friend.save();
+
     await notificationService.create({
       user: friendId,
       createdBy: userId,
@@ -75,7 +78,16 @@ class UserService extends BaseService<UserDocument> {
 
     user.friends.push(friend);
     user.friendRequestsReceived.filter((fr) => fr.toString() !== friend._id.toString());
+    friend.friends.push(user);
+    friend.friendRequestsSent.filter((fr) => fr.toString() !== user._id.toString());
     await user.save();
+    await friend.save();
+
+    await notificationService.create({
+      user: friendId,
+      createdBy: userId,
+      message: NOTIFICATION_MESSAGES.FRIEND_REQUEST_ACCEPTED
+    });
 
     return user;
   }
@@ -94,7 +106,9 @@ class UserService extends BaseService<UserDocument> {
     }
 
     user.friendRequestsReceived.filter((fr) => fr.toString() !== friend._id.toString());
+    friend.friendRequestsSent.filter((fr) => fr.toString() !== user._id.toString());
     await user.save();
+    await friend.save();
 
     return user;
   }
@@ -106,19 +120,23 @@ class UserService extends BaseService<UserDocument> {
       throw new NotFoundError('User not found');
     }
 
+    const friend = await this.findOne({ _id: friendId });
+
     const updatedUser = this.partiallyUpdate((userId as unknown) as string, {
       $pull: { friendRequestsSent: friendId }
     });
 
-    // await User.updateOne({_id:userId}, {$pull: {friendRequestsSent: friendId}});
+    if (!friend) {
+      throw new NotFoundError('User not found');
+    }
 
-    // user.friendRequestsSent.filter((fr) => fr.toString() !== friendId.toString());
-    // await user.save();
+    friend.friendRequestsSent.filter((fr) => fr.toString() !== user._id.toString());
+    await friend?.save();
 
     return updatedUser;
   }
 
-  async removeFriend(userId: string, friendId: string) {
+  async removeFriend(userId: ObjectId, friendId: ObjectId) {
     const user = await this.findOne({ _id: userId });
 
     if (!user) {
@@ -131,8 +149,18 @@ class UserService extends BaseService<UserDocument> {
       throw new NotFoundError('User not found');
     }
 
-    user.friends.filter((fr) => fr.toString() !== friend._id.toString());
+    await this.partiallyUpdate((userId as unknown) as string, {
+      $pull: { friends: friendId }
+    });
+
+    // await User.findByIdAndUpdate(userId, {
+    //   friends: user.friends.filter((fr) => fr.username !== friend.username)
+    // });
+
+    user.friends.filter((fr) => fr.username !== friend.username);
     await user.save();
+    friend.friends.filter((fr) => fr.toString() !== user.toString());
+    await friend.save();
 
     return user;
   }

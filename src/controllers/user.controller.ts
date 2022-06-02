@@ -2,9 +2,9 @@ import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import { ObjectId } from 'mongoose';
 
-import { InvalidInput } from '../errors';
+import { InvalidInput, NotFoundError } from '../errors';
 import Unauthorized from '../errors/unauthorized';
-import { Post, UserDocument, UserResponse } from '../models';
+import { Post, UserDocument, UserResponse, Message, Conversation } from '../models';
 import postService from '../services/PostService';
 import userService from '../services/UserService';
 import { getPaginationParamsFromRequest } from '../utils/pagination/getPaginationParamsFromRequest';
@@ -221,6 +221,15 @@ export async function removeFriendRequest(req: Request, res: Response) {
   return res.status(200).send(newUser);
 }
 
+export async function removeFriend(req: Request, res: Response) {
+  const newUser = await userService.removeFriend(
+    (req.userId! as unknown) as ObjectId,
+    (req.params.id as unknown) as ObjectId
+  );
+
+  return res.status(200).send(newUser);
+}
+
 export async function getRecommendedUsers(
   req: Request,
   res: Response
@@ -234,4 +243,59 @@ export async function getRecommendedUsers(
   return res
     .status(paginatedResultEvent.getStatusCode())
     .send(paginatedResultEvent.serializeRest());
+}
+
+export async function sendMessage(req: Request, res: Response) {
+  const { content } = req.body;
+  const { id: receiverId } = req.params;
+
+  let conversation;
+
+  const existingConversation = await Conversation.findOne({
+    members: {
+      $all: [req.userId, receiverId]
+    }
+  });
+
+  if (existingConversation) {
+    conversation = existingConversation;
+  } else {
+    const newConversation = await Conversation.create({
+      members: [req.userId, receiverId]
+    });
+
+    conversation = newConversation;
+  }
+
+  const message = await Message.create({
+    conversationId: conversation._id,
+    createdBy: req.userId,
+    content
+  });
+
+  return res.status(201).send(message);
+}
+
+export async function getMessagesByUser(req: Request, res: Response) {
+  const { id: senderId } = req.params;
+
+  try {
+    const relatedConversation = await Conversation.findOne({
+      members: {
+        $all: [senderId, req.userId]
+      }
+    });
+
+    if (!relatedConversation) {
+      throw new NotFoundError('Conversation not found.');
+    }
+
+    const messages = await Message.find({
+      conversationId: relatedConversation._id
+    });
+
+    return res.status(200).send(messages);
+  } catch (err) {
+    throw new NotFoundError('Conversation not found.');
+  }
 }

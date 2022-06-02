@@ -11,7 +11,8 @@ import {
   usersRouter,
   gamesRouter,
   categoriesRouter,
-  postRouter
+  postRouter,
+  conversationRouter
 } from './routes';
 import { errorHandler } from './middlewares';
 import notificationRouter from './routes/notification';
@@ -39,7 +40,45 @@ app.use(gamesRouter);
 app.use(categoriesRouter);
 app.use(postRouter);
 app.use(notificationRouter);
+app.use(conversationRouter);
 
 app.use(errorHandler);
+
+const users = [] as { userId: string; socketId: string }[];
+
+function adduser(userId: string, socketId: string) {
+  if (users.map((user) => user.userId).includes(userId)) {
+    return;
+  }
+  users.push({ userId, socketId });
+}
+
+function removeUser(socketId: string) {
+  users.filter((user) => user.socketId !== socketId);
+}
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const io = require('socket.io')(8900, {
+  cors: {
+    origin: 'http://localhost:3000'
+  }
+});
+
+io.on('connection', (socket: any) => {
+  console.log('a user connected');
+
+  io.emit('welcome', 'testtttttttt');
+
+  socket.on('addUser', (userId: string) => {
+    adduser(userId, socket.id);
+    io.emit('getUsers', users);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+    removeUser(socket.id);
+    io.emit('getUsers', users);
+  });
+});
 
 export default app;

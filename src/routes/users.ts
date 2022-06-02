@@ -21,9 +21,12 @@ import {
   getUsers,
   partiallyUpdateAuthUser,
   rejectFriendRequest,
+  removeFriend,
   removeFriendRequest,
   sendFriendRequest,
-  updateAuthUser
+  updateAuthUser,
+  sendMessage,
+  getMessagesByUser
 } from '../controllers/user.controller';
 import { validateToken, validateUniqueUser } from '../middlewares';
 import validatePasswordSchema from '../validation/validatePasswordSchema';
@@ -76,6 +79,11 @@ usersRouter.post(
   removeFriendRequest
 );
 
+usersRouter.post(`${USER_DETAIL_ID_ROUTE}/remove-friend`, validateToken, removeFriend);
+
 usersRouter.get(`${USERS_ME_ROUTE}friends`, validateToken, getCurrentUserFriends);
+
+usersRouter.post(`${USER_DETAIL_ID_ROUTE}/send-message`, validateToken, sendMessage);
+usersRouter.get(`${USER_DETAIL_ID_ROUTE}/messages`, validateToken, getMessagesByUser);
 
 export default usersRouter;

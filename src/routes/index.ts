@@ -7,3 +7,4 @@ export { default as usersRouter } from './users';
 export { default as gamesRouter } from './game';
 export { default as categoriesRouter } from './category';
 export { default as postRouter } from './post';
+export { default as conversationRouter } from './conversation';

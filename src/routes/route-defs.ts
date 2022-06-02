@@ -24,3 +24,7 @@ export const POST_COMMENT_ROUTE = '/api/posts/:id/comment';
 export const POST_LIKED_USERS_ROUTE = '/api/posts/:id/liked-users';
 
 export const NOTIFICATIONS_ROUTE = '/api/notifications/';
+
+export const CONVERSATIONS_ROUTE = '/api/conversations/';
+
+export const MESSAGE_ROUTE = '/api/messages/';
