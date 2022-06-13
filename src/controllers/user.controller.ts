@@ -267,11 +267,15 @@ export async function sendMessage(req: Request, res: Response) {
     conversation = newConversation;
   }
 
-  const message = await Message.create({
+  const newMessage = await Message.create({
     conversationId: conversation._id,
     createdBy: req.userId,
     content
   });
+
+  const message = await Message.findOne({
+    _id: newMessage._id
+  }).populate('createdBy');
 
   return res.status(201).send(message);
 }
@@ -292,7 +296,9 @@ export async function getMessagesByUser(req: Request, res: Response) {
 
     const messages = await Message.find({
       conversationId: relatedConversation._id
-    });
+    })
+      .sort({ createdAt: -1 })
+      .populate('createdBy');
 
     return res.status(200).send(messages);
   } catch (err) {

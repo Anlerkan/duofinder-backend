@@ -4,6 +4,7 @@ import { PasswordHash } from '../utils';
 import { IGame } from './Game';
 
 export type IUser = {
+  _id: string;
   email: string;
   password: string;
   username: string;

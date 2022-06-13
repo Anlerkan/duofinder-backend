@@ -5,16 +5,22 @@ export type IComment = {
   createdBy: UserDocument;
   createdAt: string;
   content: string;
+  postId: string;
 };
 
 export type CommentDocument = mongoose.Document & IComment;
 
 export type CommentModel = mongoose.Model<CommentDocument>;
 
-export const commentSchema = new mongoose.Schema<CommentDocument, CommentModel, IComment>({
+export const commentSchema = new mongoose.Schema({
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
+    required: true
+  },
+  postId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Post',
     required: true
   },
   createdAt: {

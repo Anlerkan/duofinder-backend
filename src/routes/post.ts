@@ -5,7 +5,9 @@ import {
   getPostById,
   getPosts,
   likePost,
-  unlikePost
+  unlikePost,
+  getPostComments,
+  addPostComment
 } from '../controllers/post.controller';
 
 import { validateToken } from '../middlewares';
@@ -15,7 +17,8 @@ import {
   POST_DETAIL_ROUTE,
   POST_LIKED_USERS_ROUTE,
   POST_LIKE_ROUTE,
-  POST_UNLIKE_ROUTE
+  POST_UNLIKE_ROUTE,
+  POST_COMMENT_ROUTE
 } from './route-defs';
 
 const postRouter = express.Router();
@@ -25,6 +28,9 @@ postRouter.get(POSTS_ROUTE, validateToken, getPosts);
 postRouter.get(POST_DETAIL_ROUTE, validateToken, getPostById);
 postRouter.post(POST_LIKE_ROUTE, validateToken, likePost);
 postRouter.post(POST_UNLIKE_ROUTE, validateToken, unlikePost);
+postRouter.get(POST_COMMENT_ROUTE, validateToken, getPostComments);
+postRouter.post(POST_COMMENT_ROUTE, validateToken, addPostComment);
+
 postRouter.get(POST_LIKED_USERS_ROUTE, validateToken, getLikedUsers);
 
 export default postRouter;

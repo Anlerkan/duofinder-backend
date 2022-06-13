@@ -3,7 +3,7 @@ import { json, text } from 'body-parser';
 import 'express-async-errors';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import { createClient } from 'redis';
+
 import {
   signUpRouter,
   verifyRouter,
@@ -16,6 +16,7 @@ import {
 } from './routes';
 import { errorHandler } from './middlewares';
 import notificationRouter from './routes/notification';
+import { IUser } from './models';
 
 const app = express();
 
@@ -57,6 +58,10 @@ function removeUser(socketId: string) {
   users.filter((user) => user.socketId !== socketId);
 }
 
+function getUser(userId: string) {
+  return users.find((user) => user.userId === userId);
+}
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const io = require('socket.io')(8900, {
   cors: {
@@ -72,6 +77,24 @@ io.on('connection', (socket: any) => {
   socket.on('addUser', (userId: string) => {
     adduser(userId, socket.id);
     io.emit('getUsers', users);
+  });
+
+  socket.on('sendMessage', (user: IUser, receiver: IUser, message: string) => {
+    const socketUser = getUser(receiver._id);
+
+    console.log(socketUser, 'socketUser');
+
+    console.log(user?.username, 'user');
+    console.log(receiver?.username, 'receiver');
+    console.log(message);
+
+    if (socketUser) {
+      io.to(socketUser.socketId).emit('getMessage', {
+        createdBy: user,
+        createdAt: new Date().toLocaleString(),
+        content: message
+      });
+    }
   });
 
   socket.on('disconnect', () => {

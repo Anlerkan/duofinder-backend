@@ -5,7 +5,7 @@ import { FilterQuery, ObjectId } from 'mongoose';
 import { InvalidInput } from '../errors';
 import NotFoundError from '../errors/not-found';
 import PaginatedResultEvent from '../events/paginated-result';
-import { IPost, Post, PostDocument, PostResponse } from '../models';
+import { IPost, Post, PostDocument, PostResponse, Comment } from '../models';
 import likeService from '../services/LikeService';
 import postService from '../services/PostService';
 import userService from '../services/UserService';
@@ -58,6 +58,28 @@ export async function getPosts(req: Request, res: Response) {
   return res
     .status(paginatedResultEvent.getStatusCode())
     .send(paginatedResultEvent.serializeRest());
+}
+
+export async function addPostComment(req: Request, res: Response) {
+  const { id } = req.params;
+  const { content } = req.body;
+  const currentUser = await userService.findOne({ _id: req.userId });
+
+  const newComment = await Comment.create({
+    content,
+    createdBy: currentUser,
+    postId: id
+  });
+
+  return res.status(201).send(newComment);
+}
+
+export async function getPostComments(req: Request, res: Response) {
+  const { id } = req.params;
+
+  const comments = await Comment.find({ postId: id }).populate('createdBy');
+
+  return res.status(200).send(comments);
 }
 
 export async function addPost(req: Request<any, IPost, Omit<IPost, 'createdAt'>>, res: Response) {
