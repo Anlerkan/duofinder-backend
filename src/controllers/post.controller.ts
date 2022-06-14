@@ -77,7 +77,7 @@ export async function addPostComment(req: Request, res: Response) {
 export async function getPostComments(req: Request, res: Response) {
   const { id } = req.params;
 
-  const comments = await Comment.find({ postId: id }).populate('createdBy');
+  const comments = await Comment.find({ postId: id }).populate('createdBy').sort('-createdAt');
 
   return res.status(200).send(comments);
 }
